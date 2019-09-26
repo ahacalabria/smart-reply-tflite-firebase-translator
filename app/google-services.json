@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "556153295695",
+    "firebase_url": "https://smart-reply-tflite.firebaseio.com",
+    "project_id": "smart-reply-tflite",
+    "storage_bucket": "smart-reply-tflite.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556153295695:android:893086c621c5f190812b3a",
+        "android_client_info": {
+          "package_name": "com.example.android.smartreply"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "556153295695-pkveivfblgijulfta61rmh0nu6kc9qpa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjotQ3q1w5ge3TEh17bmdU9RjuJ60Qe1Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "556153295695-pkveivfblgijulfta61rmh0nu6kc9qpa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
