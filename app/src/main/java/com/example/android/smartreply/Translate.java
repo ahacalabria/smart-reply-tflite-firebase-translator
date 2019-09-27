@@ -25,6 +25,7 @@ public class Translate {
     private static FirebaseTranslator tradutorPT_EN;
     private static FirebaseTranslator tradutorEN_PT;
     private final String REMOTE_USER_ID = UUID.randomUUID().toString();
+    private static int index = 0;
 
     public Translate(Context app){
         FirebaseApp fapp = FirebaseApp.initializeApp(app);
@@ -96,8 +97,8 @@ public class Translate {
                                                             @Override
                                                             public void onSuccess(String translatedText2) {
                                                                 System.err.println("translatedText2: "+translatedText2);
-                                                                mainActivity.appendMessage("Reply: " + translatedText2 );
-
+                                                                mainActivity.appendMessage( translatedText2, index );
+                                                                    index += 1;
                                                                 s_words.add(translatedText2);
                                                             }
                                                         }).addOnFailureListener(
@@ -111,7 +112,9 @@ public class Translate {
                                                 });
 
                                     }
+                                    index = 0;
                                     int i = 0;
+                                    /*
                                     for (String sw : s_words) {
                                         Button myButton = new Button(mainActivity);
                                         myButton.setText(sw);
@@ -128,6 +131,8 @@ public class Translate {
                                             }
                                         });
                                     }
+
+                                     */
 
                                 }
                             })
