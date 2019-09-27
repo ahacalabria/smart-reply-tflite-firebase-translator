@@ -1,10 +1,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/normal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <LinearLayout
+        android:background="@color/normal"
         android:id="@+id/linearLayout6"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,12 +19,14 @@
 
 
         <com.google.android.material.textfield.TextInputLayout
+            android:background="@color/normal"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:background="@color/normal"
                 android:id="@+id/theTextToSpeechTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -45,6 +49,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:background="@color/normal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -55,6 +60,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
+            android:background="@color/normal"
             android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,6 +68,8 @@
             android:orientation="vertical">
 
             <TextView
+                android:background="@color/normal"
+                android:textColor="@color/normalTextColor"
                 android:id="@+id/suggestion1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,6 +79,8 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:background="@color/normal"
+                android:textColor="@color/normalTextColor"
                 android:id="@+id/suggestion2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -80,6 +90,8 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:background="@color/normal"
+                android:textColor="@color/normalTextColor"
                 android:id="@+id/suggestion3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -90,6 +102,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:background="@color/normal"
             android:id="@+id/linearLayout5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -97,6 +110,8 @@
             android:orientation="vertical">
 
             <TextView
+                android:background="@color/normal"
+                android:textColor="@color/normalTextColor"
                 android:id="@+id/suggestion4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -106,6 +121,8 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:background="@color/normal"
+                android:textColor="@color/normalTextColor"
                 android:id="@+id/suggestion5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -115,6 +132,8 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:background="@color/normal"
+                android:textColor="@color/normalTextColor"
                 android:id="@+id/suggestion6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,6 +145,7 @@
     </LinearLayout>
 
     <TextView
+        android:background="@color/normal"
         android:id="@+id/selectedTextToSpeech"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

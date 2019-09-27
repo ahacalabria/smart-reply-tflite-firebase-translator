@@ -16,6 +16,8 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +25,7 @@ import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.text.DynamicLayout;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -63,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int NUBER_OF_SUGGESTIONS = 5;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private EditText meuAudioEmTexto;
+    private ServiceFalar ttsManager = null;
+    RoletaDaEscolha roletaDaEscolha = new RoletaDaEscolha();
+    public String escolha;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -91,28 +97,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Deixa teclado sempre aberto
         upKeyboard(meuAudioEmTexto);
-    }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.v(TAG, "onStart");
-        handler.post(
-                () -> {
-                    client.loadModel();
-                });
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.v(TAG, "onStop");
-        handler.post(
-                () -> {
-                    client.unloadModel();
-                });
+        // Negocios da Fala
+        ttsManager = new ServiceFalar();
+        ttsManager.init(this);
     }
 
     private void send(final String message) {
@@ -130,6 +118,9 @@ public class MainActivity extends AppCompatActivity {
                     if ( i <= NUBER_OF_SUGGESTIONS ) {
                         sugg.get(i).setText(message);
                     }
+                    if (i == NUBER_OF_SUGGESTIONS + 1) {
+                        roletaDaEscolha.execute(NUBER_OF_SUGGESTIONS + 2);
+                    }
                 });
     }
 
@@ -141,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         mgr.showSoftInput(meuAudioEmTexto, InputMethodManager.SHOW_IMPLICIT);
     }
 
-    //Metodos de ação de clique
+    //Metodos de ação de clique/toque
     public void ouvir(View view) {
         upKeyboard(view);
         limpar(view);
@@ -150,14 +141,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void limpar(View view) {
         meuAudioEmTexto.setText("");
-        //textoSugeridoSelecionado.setText("");
         suggestion1.setText("--");
         suggestion2.setText("--");
         suggestion3.setText("--");
         suggestion4.setText("--");
         suggestion5.setText("--");
         suggestion6.setText("--");
-        //string = "";
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+
+        ttsManager.initQueue(escolha);
+        Log.e("Enviado para Falar", escolha);
+        roletaDaEscolha.cancel(true);
+        return false;
     }
 
     //Metodos de audição
@@ -188,4 +187,126 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Faz a rodizio para escolha das sugestões
+    class RoletaDaEscolha extends AsyncTask< Integer, Integer, String > {
+
+        @Override
+        protected String doInBackground(Integer... integers) {
+
+            int numero = integers[0];
+            for(int i=0; i<numero; i++) {
+
+                publishProgress(i);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            return "Finalizado";
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+
+            switch (values[0]) {
+                case 0:
+                    setEscolha(suggestion1.getText().toString());
+                    destaca(suggestion1);
+                    break;
+                case 1:
+                    setEscolha(suggestion2.getText().toString());
+                    destaca(suggestion2);
+                    restaura(suggestion1);
+                    break;
+                case 2:
+                    setEscolha(suggestion3.getText().toString());
+                    destaca(suggestion3);
+                    restaura(suggestion2);
+                    break;
+                case 3:
+                    setEscolha(suggestion4.getText().toString());
+                    destaca(suggestion4);
+                    restaura(suggestion3);
+                    break;
+                case 4:
+                    setEscolha(suggestion5.getText().toString());
+                    destaca(suggestion5);
+                    restaura(suggestion4);
+                    break;
+                case 5:
+                    setEscolha(suggestion6.getText().toString());
+                    destaca(suggestion6);
+                    restaura(suggestion5);
+                    break;
+                case 6:
+                    restaura(suggestion6);
+                    break;
+            }
+            //progressBar.setProgress( values[0] );
+            //textView.setText(String.valueOf( values[0] ));
+
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            //progressBar.setProgress(0);
+            //progressBar.setVisibility(View.INVISIBLE);
+
+        }
+
+        public TextView restaura(TextView textView) {
+            textView.setTextColor(getResources().getColor(R.color.normalTextColor));
+            textView.setBackgroundResource(R.color.normal);
+            textView.setTypeface(null, Typeface.NORMAL);
+            return textView;
+        }
+
+        public TextView destaca(TextView textView) {
+            textView.setTextColor(getResources().getColor(R.color.destaqueTextColor));
+            textView.setBackgroundResource(R.color.destaque);
+            textView.setTypeface(null, Typeface.BOLD);
+            return textView;
+        }
+
+        public void setEscolha(String string) {
+            escolha = string;
+        }
+
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onStart() {
+        super.onStart();
+        upKeyboard(meuAudioEmTexto);
+        handler.post(
+                () -> {
+                    client.loadModel();
+                });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.v(TAG, "onStop");
+        handler.post(
+                () -> {
+                    client.unloadModel();
+                });
+    }
+
+    //Desaloca os recursos usados pelo TextToSpeech
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ttsManager.shutDown();
+    }
 }
