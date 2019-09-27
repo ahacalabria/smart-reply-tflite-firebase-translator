@@ -52,6 +52,12 @@ public class MainActivity extends Activity {
 
     private ArrayList<String> s_words;
     private Translate tradutor;
+    private ArrayList<String> suggestions = new ArrayList<>();
+    private ArrayList<TextView> sugg = new ArrayList<>();
+    private TextView sugestion1;
+    private TextView sugestion2;
+    private TextView sugestion3;
+    private TextView sugestion4;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -60,6 +66,12 @@ public class MainActivity extends Activity {
         this.tradutor = Translate.getInstance(this);
         Log.v(TAG, "onCreate");
         setContentView(R.layout.main_activity);
+        messageTextView = findViewById(R.id.message_text);
+        messageInput = findViewById(R.id.message_input);
+        sugestion1 = findViewById(R.id.sugestao1);
+        sugestion2 = findViewById(R.id.sugestao2);
+        sugestion3 = findViewById(R.id.sugestao3);
+        sugestion4 = findViewById(R.id.sugestao4);
 
         client = new SmartReplyClient(getApplicationContext());
         handler = new Handler();
@@ -70,12 +82,18 @@ public class MainActivity extends Activity {
                     send(messageInput.getText().toString());
                 });
 
-        messageTextView = findViewById(R.id.message_text);
-        messageInput = findViewById(R.id.message_input);
-//        tempButton = findViewById(R.id.floatButton);
+
+        //tempButton = findViewById(R.id.floatButton);
         s_words = new ArrayList<String>();
+
+        sugg.add(sugestion1);
+        sugg.add(sugestion2);
+        sugg.add(sugestion3);
+        sugg.add(sugestion4);
+
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onStart() {
         super.onStart();
@@ -86,6 +104,7 @@ public class MainActivity extends Activity {
                 });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onStop() {
         super.onStop();
@@ -103,16 +122,22 @@ public class MainActivity extends Activity {
                     //passar uma string como entrada, o client SMART REPLY, uma lista de respostas 's_words', e a Main Activity
                     tradutor.traduzirPT_EN(new String[] {message}, client, s_words, this);
 
-                    appendMessage("------");
                     messageInput.setText("");
 
                 });
     }
 
-    public void appendMessage(final String message) {
+    public void appendMessage(final String message, final int i) {
         handler.post(
                 () -> {
                     messageTextView.append(message + "\n");
+                    suggestions.add(message);
+                    Log.e("kkkkk", suggestions.get( suggestions.indexOf(message) ));
+                    if ( i <= 3 ) {
+                        sugg.get(i).setText(message);
+                    }
                 });
+
+
     }
 }
