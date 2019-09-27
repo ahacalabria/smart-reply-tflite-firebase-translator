@@ -133,6 +133,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Metodos de ação de clique/toque
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        super.onTouchEvent(event);
+
+        // O teste inicial impede que o app quebre com o toque antes de utilizar
+        if (escolha != null) {
+            ttsManager.initQueue(escolha);
+            Log.e("Enviado para Falar", escolha);
+            roletaDaEscolha.cancel(true);
+            return false;
+        }
+        return true;
+    }
+
     public void ouvir(View view) {
         upKeyboard(view);
         limpar(view);
@@ -147,16 +161,6 @@ public class MainActivity extends AppCompatActivity {
         suggestion4.setText("--");
         suggestion5.setText("--");
         suggestion6.setText("--");
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        super.onTouchEvent(event);
-
-        ttsManager.initQueue(escolha);
-        Log.e("Enviado para Falar", escolha);
-        roletaDaEscolha.cancel(true);
-        return false;
     }
 
     //Metodos de audição
