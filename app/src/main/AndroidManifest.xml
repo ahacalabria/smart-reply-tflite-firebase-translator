@@ -2,13 +2,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.android.smartreply">
 
-    <application android:label="TfLite SmartReply Demo">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:screenOrientation="portrait"
+        android:supportsRtl="true">
         <activity
-            android:name="com.example.android.smartreply.MainActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="stateUnchanged|adjustPan"
-            android:label="TfLite SmartReply Demo"
-            android:screenOrientation="portrait" >
+            android:name="com.example.android.smartreply.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

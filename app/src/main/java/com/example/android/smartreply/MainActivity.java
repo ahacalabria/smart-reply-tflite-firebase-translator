@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.FirebaseApp;
@@ -39,7 +40,7 @@ import java.util.Locale;
  * The main (and only) activity of this demo app. Displays a text box which updates as messages are
  * received.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "SmartReplyDemo";
     private SmartReplyClient client;
 
