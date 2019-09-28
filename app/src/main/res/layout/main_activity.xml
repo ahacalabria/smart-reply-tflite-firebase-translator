@@ -145,7 +145,6 @@
     </LinearLayout>
 
     <TextView
-        android:background="@color/normal"
         android:id="@+id/selectedTextToSpeech"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -154,7 +153,9 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="8dp"
-        android:textSize="18sp"
-        android:drawableLeft="@drawable/ic_speak__24dp"/>
+        android:background="@color/normal"
+        android:drawableLeft="@drawable/ic_speak__24dp"
+        android:text=" "
+        android:textSize="18sp" />
 
 </LinearLayout>

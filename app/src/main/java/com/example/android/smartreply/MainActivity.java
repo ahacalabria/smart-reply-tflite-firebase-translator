@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView suggestion4;
     private TextView suggestion5;
     private TextView suggestion6;
+    public TextView theSelectedTextToSpeech;
     private static final int NUBER_OF_SUGGESTIONS = 5;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private EditText meuAudioEmTexto;
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         suggestion5 = findViewById(R.id.suggestion5);
         suggestion6 = findViewById(R.id.suggestion6);
         meuAudioEmTexto = findViewById(R.id.theTextToSpeechTextView);
+        theSelectedTextToSpeech = findViewById(R.id.selectedTextToSpeech);
 
         // Negocios do SmartReply
         client = new SmartReplyClient(getApplicationContext());
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         sugg.get(i).setText(message);
                     }
                     if (i == NUBER_OF_SUGGESTIONS + 1) {
-                        roletaDaEscolha.execute(NUBER_OF_SUGGESTIONS + 2);
+                        roletaDaEscolha.execute(2 * NUBER_OF_SUGGESTIONS + 3);
                     }
                 });
     }
@@ -139,10 +141,9 @@ public class MainActivity extends AppCompatActivity {
 
         // O teste inicial impede que o app quebre com o toque antes de utilizar
         if (escolha != null) {
-            ttsManager.initQueue(escolha);
-            Log.e("Enviado para Falar", escolha);
-            roletaDaEscolha.cancel(true);
-            return false;
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                theSelectedTextToSpeech.append( escolha + " ");
+            }
         }
         return true;
     }
@@ -248,6 +249,36 @@ public class MainActivity extends AppCompatActivity {
                     restaura(suggestion5);
                     break;
                 case 6:
+                    setEscolha(suggestion1.getText().toString());
+                    destaca(suggestion1);
+                    restaura(suggestion6);
+                    break;
+                case 7:
+                    setEscolha(suggestion2.getText().toString());
+                    restaura(suggestion1);
+                    destaca(suggestion2);
+                    break;
+                case 8:
+                    setEscolha(suggestion3.getText().toString());
+                    restaura(suggestion2);
+                    destaca(suggestion3);
+                    break;
+                case 9:
+                    setEscolha(suggestion4.getText().toString());
+                    restaura(suggestion3);
+                    destaca(suggestion4);
+                    break;
+                case 10:
+                    setEscolha(suggestion5.getText().toString());
+                    restaura(suggestion4);
+                    destaca(suggestion5);
+                    break;
+                case 11:
+                    setEscolha(suggestion6.getText().toString());
+                    restaura(suggestion5);
+                    destaca(suggestion6);
+                    break;
+                case 12:
                     restaura(suggestion6);
                     break;
             }
@@ -261,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(s);
             //progressBar.setProgress(0);
             //progressBar.setVisibility(View.INVISIBLE);
-
+            ttsManager.initQueue(theSelectedTextToSpeech.getText().toString());
         }
 
         public TextView restaura(TextView textView) {
@@ -312,5 +343,10 @@ public class MainActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         ttsManager.shutDown();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 }
