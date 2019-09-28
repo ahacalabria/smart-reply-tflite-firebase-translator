@@ -68,8 +68,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private EditText meuAudioEmTexto;
     private ServiceFalar ttsManager = null;
-    public String statusDaRoleta;
+    RoletaDaEscolha roletaDaEscolha;
     public String escolha;
+    public int loop = 1;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         ttsManager.init(this);
     }
 
+    // Metodos do SmartReply
     private void send(final String message) {
         handler.post(
                 () -> {
@@ -121,8 +123,9 @@ public class MainActivity extends AppCompatActivity {
                         sugg.get(i).setText(message);
                     }
                     if (i == NUBER_OF_SUGGESTIONS + 1) {
-                        RoletaDaEscolha roletaDaEscolha = new RoletaDaEscolha();
-                        roletaDaEscolha.execute(2 * NUBER_OF_SUGGESTIONS + 3);
+                        if(loop == 1) { //esse teste impede que a roleta reinicie eternamente
+                            roletaDaEscolha.execute(2 * NUBER_OF_SUGGESTIONS + 3);
+                        }
                     }
                 });
     }
@@ -150,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ouvir(View view) {
+        roletaDaEscolha = new RoletaDaEscolha();
         upKeyboard(view);
         limpar();
         startVoiceInput();
@@ -197,6 +201,12 @@ public class MainActivity extends AppCompatActivity {
 
     // Faz a rodizio para escolha das sugestões
     class RoletaDaEscolha extends AsyncTask< Integer, Integer, String > {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loop++;
+        }
 
         @Override
         protected String doInBackground(Integer... integers) {
@@ -252,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
                     restaura(suggestion5);
                     break;
                 case 6:
+                    send(theSelectedTextToSpeech.getText().toString());//Realimenta o SmartReply ao fim do primeiro loop
                     setEscolha(suggestion1.getText().toString());
                     destaca(suggestion1);
                     restaura(suggestion6);
@@ -295,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(s);
             //progressBar.setProgress(0);
             //progressBar.setVisibility(View.INVISIBLE);
+            loop = 1;
             theSelectedTextToSpeech.setTextColor(getResources().getColor(R.color.destaqueTextColor));
             theSelectedTextToSpeech.setTypeface(null, Typeface.BOLD);
             ttsManager.initQueue(theSelectedTextToSpeech.getText().toString());
