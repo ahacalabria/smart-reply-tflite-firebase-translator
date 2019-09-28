@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQ_CODE_SPEECH_INPUT = 100;
     private EditText meuAudioEmTexto;
     private ServiceFalar ttsManager = null;
-    RoletaDaEscolha roletaDaEscolha = new RoletaDaEscolha();
+    public String statusDaRoleta;
     public String escolha;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         sugg.get(i).setText(message);
                     }
                     if (i == NUBER_OF_SUGGESTIONS + 1) {
+                        RoletaDaEscolha roletaDaEscolha = new RoletaDaEscolha();
                         roletaDaEscolha.execute(2 * NUBER_OF_SUGGESTIONS + 3);
                     }
                 });
@@ -150,11 +151,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void ouvir(View view) {
         upKeyboard(view);
-        limpar(view);
+        limpar();
         startVoiceInput();
     }
 
-    public void limpar(View view) {
+    public void limpar() {
         meuAudioEmTexto.setText("");
         suggestion1.setText("--");
         suggestion2.setText("--");
@@ -162,6 +163,8 @@ public class MainActivity extends AppCompatActivity {
         suggestion4.setText("--");
         suggestion5.setText("--");
         suggestion6.setText("--");
+        theSelectedTextToSpeech.setText(" ");
+        escolha = "";
     }
 
     //Metodos de audição
@@ -292,7 +295,11 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(s);
             //progressBar.setProgress(0);
             //progressBar.setVisibility(View.INVISIBLE);
+            theSelectedTextToSpeech.setTextColor(getResources().getColor(R.color.destaqueTextColor));
+            theSelectedTextToSpeech.setTypeface(null, Typeface.BOLD);
             ttsManager.initQueue(theSelectedTextToSpeech.getText().toString());
+            limpar();
+
         }
 
         public TextView restaura(TextView textView) {
