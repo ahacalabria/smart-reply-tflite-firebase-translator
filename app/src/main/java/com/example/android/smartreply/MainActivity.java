@@ -12,8 +12,6 @@ limitations under the License.
 
 package com.example.android.smartreply;
 
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -21,35 +19,30 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-//import androidx.FloatingActionButton;
+import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
-import android.text.DynamicLayout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.FirebaseApp;
+import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.speech.SpeechRecognizer;
+import android.widget.ProgressBar;
 
-/**
- * The main (and only) activity of this demo app. Displays a text box which updates as messages are
- * received.
- */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        RecognitionListener {
 
     private static final String TAG = "SmartReplyDemo";
     private SmartReplyClient client;
@@ -63,14 +56,19 @@ public class MainActivity extends AppCompatActivity {
     private TextView suggestion4;
     private TextView suggestion5;
     private TextView suggestion6;
+    public TextView transcription;
     public TextView theSelectedTextToSpeech;
     private static final int NUBER_OF_SUGGESTIONS = 5;
-    private static final int REQ_CODE_SPEECH_INPUT = 100;
     private EditText meuAudioEmTexto;
     private ServiceFalar ttsManager = null;
     RoletaDaEscolha roletaDaEscolha;
     public String escolha = "";
     public int loop = 1;
+    private static final int REQUEST_RECORD_PERMISSION = 100;
+    private ProgressBar progressBar;
+    private SpeechRecognizer speech = null;
+    private Intent recognizerIntent;
+    private String LOG_TAG = "MainActivity";
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -86,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
         suggestion6 = findViewById(R.id.suggestion6);
         meuAudioEmTexto = findViewById(R.id.theTextToSpeechTextView);
         theSelectedTextToSpeech = findViewById(R.id.selectedTextToSpeech);
+        transcription = findViewById(R.id.transcriptionid);
+        progressBar = findViewById(R.id.progressBar1);
 
         // Negocios do SmartReply
         client = new SmartReplyClient(getApplicationContext());
@@ -104,6 +104,16 @@ public class MainActivity extends AppCompatActivity {
         // Negocios da Fala
         ttsManager = new ServiceFalar();
         ttsManager.init(this);
+
+        // Negocios do Speech to text
+        progressBar.setVisibility(View.INVISIBLE);
+        speech = SpeechRecognizer.createSpeechRecognizer(this);
+        Log.i(LOG_TAG, "isRecognitionAvailable: " + SpeechRecognizer.isRecognitionAvailable(this));
+        speech.setRecognitionListener(this);
+        recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "pt-BR");
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
     }
 
     // Metodos do SmartReply
@@ -153,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 theSelectedTextToSpeech.append( escolha + " ");
             }
-
         }
         return true;
     }
@@ -162,7 +171,10 @@ public class MainActivity extends AppCompatActivity {
         roletaDaEscolha = new RoletaDaEscolha();
         upKeyboard(view);
         limpar();
-        startVoiceInput();
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setIndeterminate(true);
+        ActivityCompat.requestPermissions
+                (MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_RECORD_PERMISSION);
     }
 
     public void limpar() {
@@ -175,35 +187,7 @@ public class MainActivity extends AppCompatActivity {
         suggestion6.setText("--");
         theSelectedTextToSpeech.setText(" ");
         escolha = "";
-    }
-
-    //Metodos de audição
-    private void startVoiceInput() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Ouvindo...");
-        try {
-            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-        } catch (ActivityNotFoundException a) {
-
-        }
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode) {
-            case REQ_CODE_SPEECH_INPUT: {
-                if (resultCode == RESULT_OK && null != data) {
-                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    meuAudioEmTexto.setText(result.get(0));
-                    send(result.get(0));
-                    Log.e("-------> Microfone", result.get(0));
-                }
-                break;
-            }
-        }
+        transcription.setText("");
     }
 
     // Faz a rodizio para escolha das sugestões
@@ -228,9 +212,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
             }
-
             return "Finalizado";
         }
 
@@ -303,22 +285,16 @@ public class MainActivity extends AppCompatActivity {
                     restaura(suggestion6);
                     break;
             }
-            //progressBar.setProgress( values[0] );
-            //textView.setText(String.valueOf( values[0] ));
-
         }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            //progressBar.setProgress(0);
-            //progressBar.setVisibility(View.INVISIBLE);
             loop = 1;
             theSelectedTextToSpeech.setTextColor(getResources().getColor(R.color.destaqueTextColor));
             theSelectedTextToSpeech.setTypeface(null, Typeface.BOLD);
             ttsManager.initQueue(theSelectedTextToSpeech.getText().toString());
             limpar();
-
         }
 
         public TextView restaura(TextView textView) {
@@ -338,8 +314,115 @@ public class MainActivity extends AppCompatActivity {
         public void setEscolha(String string) {
             escolha = string;
         }
+    }
 
+    //Implementação da interface de AUDIÇÃO SpeechRecognizer
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_RECORD_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    speech.startListening(recognizerIntent);
+                } else {
+                    Toast.makeText(this, "Permissão NEGADA!", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
 
+    @Override
+    public void onBeginningOfSpeech() {
+        Log.i(LOG_TAG, "onBeginningOfSpeech");
+        progressBar.setIndeterminate(false);
+        progressBar.setMax(10);
+    }
+
+    @Override
+    public void onBufferReceived(byte[] buffer) {
+        Log.i(LOG_TAG, "onBufferReceived: " + buffer);
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+        Log.i(LOG_TAG, "onEndOfSpeech");
+        progressBar.setIndeterminate(true);
+        progressBar.setIndeterminate(false);
+        progressBar.setVisibility(View.INVISIBLE);
+        speech.stopListening();
+    }
+
+    @Override
+    public void onError(int errorCode) {
+        String errorMessage = getErrorText(errorCode);
+        Log.d(LOG_TAG, "FALHOU " + errorMessage);
+        Toast.makeText(this, "erro na Captação =(", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onEvent(int arg0, Bundle arg1) {
+        Log.i(LOG_TAG, "onEvent");
+    }
+
+    @Override
+    public void onPartialResults(Bundle arg0) {
+        Log.i(LOG_TAG, "onPartialResults");
+    }
+
+    @Override
+    public void onReadyForSpeech(Bundle arg0) {
+        Log.i(LOG_TAG, "onReadyForSpeech");
+    }
+
+    @Override
+    public void onResults(Bundle results) {
+        Log.i(LOG_TAG, "onResults");
+        ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        String text = matches.get(0);
+        send(text);
+        transcription.setText(text);
+    }
+
+    @Override
+    public void onRmsChanged(float rmsdB) {
+        Log.i(LOG_TAG, "onRmsChanged: " + rmsdB);
+        progressBar.setProgress((int) rmsdB);
+    }
+
+    public static String getErrorText(int errorCode) {
+        String message;
+        switch (errorCode) {
+            case SpeechRecognizer.ERROR_AUDIO:
+                message = "Erro no reconhecimento de audio";
+                break;
+            case SpeechRecognizer.ERROR_CLIENT:
+                message = "Client side error";
+                break;
+            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                message = "Permissão insuficiente";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK:
+                message = "Erro de conexão com a internet";
+                break;
+            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
+                message = "Tempo de resposta da internet excedido";
+                break;
+            case SpeechRecognizer.ERROR_NO_MATCH:
+                message = "No match";
+                break;
+            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                message = "SpeechRecognizer ocupado";
+                break;
+            case SpeechRecognizer.ERROR_SERVER:
+                message = "Erro no servidor";
+                break;
+            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                message = "Sem entrada do SpeechRecognizer";
+                break;
+            default:
+                message = "Não entendi, por favor tente novamente";
+                break;
+        }
+        return message;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -353,6 +436,17 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onStop() {
@@ -362,9 +456,12 @@ public class MainActivity extends AppCompatActivity {
                 () -> {
                     client.unloadModel();
                 });
+        if (speech != null) {
+            speech.destroy();
+            Log.i(LOG_TAG, "destroy");
+        }
     }
 
-    //Desaloca os recursos usados pelo TextToSpeech
     @Override
     public void onDestroy() {
         super.onDestroy();
