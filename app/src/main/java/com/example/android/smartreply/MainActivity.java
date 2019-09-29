@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText meuAudioEmTexto;
     private ServiceFalar ttsManager = null;
     RoletaDaEscolha roletaDaEscolha;
-    public String escolha;
+    public String escolha = "";
     public int loop = 1;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -144,10 +144,16 @@ public class MainActivity extends AppCompatActivity {
         super.onTouchEvent(event);
 
         // O teste inicial impede que o app quebre com o toque antes de utilizar
-        if (escolha != null) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        if( event.getAction() == MotionEvent.ACTION_DOWN ) {
+            if( !meuAudioEmTexto.getText().toString().equals("") ) {
+                roletaDaEscolha = new RoletaDaEscolha();
+                upKeyboard(meuAudioEmTexto);
+                send(meuAudioEmTexto.getText().toString());
+                limpar();
+            } else {
                 theSelectedTextToSpeech.append( escolha + " ");
             }
+
         }
         return true;
     }
@@ -193,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     meuAudioEmTexto.setText(result.get(0));
                     send(result.get(0));
+                    Log.e("-------> Microfone", result.get(0));
                 }
                 break;
             }

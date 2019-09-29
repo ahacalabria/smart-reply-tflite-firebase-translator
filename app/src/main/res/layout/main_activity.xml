@@ -26,12 +26,13 @@
             android:gravity="center">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:background="@color/normal"
                 android:id="@+id/theTextToSpeechTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/normal"
+                android:drawableLeft="@drawable/ic_edit_black_24dp"
                 android:hint="Escreva:"
-                android:drawableLeft="@drawable/ic_edit_black_24dp"/>
+                android:text="" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
