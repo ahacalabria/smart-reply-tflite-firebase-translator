@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements
     private TextView suggestion4;
     private TextView suggestion5;
     private TextView suggestion6;
-    public TextView transcription;
     public TextView theSelectedTextToSpeech;
     private static final int NUBER_OF_SUGGESTIONS = 5;
     private EditText meuAudioEmTexto;
@@ -84,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements
         suggestion6 = findViewById(R.id.suggestion6);
         meuAudioEmTexto = findViewById(R.id.theTextToSpeechTextView);
         theSelectedTextToSpeech = findViewById(R.id.selectedTextToSpeech);
-        transcription = findViewById(R.id.transcriptionid);
         progressBar = findViewById(R.id.progressBar1);
 
         // Negocios do SmartReply
@@ -187,7 +185,6 @@ public class MainActivity extends AppCompatActivity implements
         suggestion6.setText("--");
         theSelectedTextToSpeech.setText(" ");
         escolha = "";
-        transcription.setText("");
     }
 
     // Faz a rodizio para escolha das sugestões
@@ -379,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements
         ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         String text = matches.get(0);
         send(text);
-        transcription.setText(text);
+        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
     }
 
     @Override
