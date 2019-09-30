@@ -153,12 +153,17 @@ public class MainActivity extends AppCompatActivity implements
 
         // O teste inicial impede que o app quebre com o toque antes de utilizar
         if( event.getAction() == MotionEvent.ACTION_DOWN ) {
-            if( !meuAudioEmTexto.getText().toString().equals("") ) {
+            if(meuAudioEmTexto.getText().toString().equals("") && suggestion1.getText().toString().equals("--")) {
+                //campo de texto e sugestões vasias: o app ouve
+                ouvir(meuAudioEmTexto);
+            } else if( !meuAudioEmTexto.getText().toString().equals("") ) {
+                //se o campo de texto não estiver vasio, o usuario digitou la e o SmartReply inicia
                 roletaDaEscolha = new RoletaDaEscolha();
                 upKeyboard(meuAudioEmTexto);
                 send(meuAudioEmTexto.getText().toString());
                 limpar();
             } else {
+                //nenhuma das anteriores: é apenas uma ação de escolha
                 theSelectedTextToSpeech.append( escolha + " ");
             }
         }
